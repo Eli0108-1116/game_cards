@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <title>卡片影像比對系統</title>
+  <style>
+    body { font-family: sans-serif; margin: 2em; }
+    label, select, input, button { display: block; margin-top: 1em; }
+    /* 允許 HTML 標籤正確渲染，移除 pre-wrap */
+    #result { margin-top: 2em; background: #f9f9f9; padding: 1em; border: 1px solid #ccc; }
+  </style>
+</head>
+<body>
+  <h1>卡片影像比對系統</h1>
+
+  <form id="matchForm">
+    <label for="category">選擇卡片類別：</label>
+    <select id="category" name="category" required>
+      <option value="">-- 請選擇 --</option>
+      <option value="同步">同步</option>
+      <option value="超量">超量</option>
+      <option value="融合">融合</option>
+      <option value="連結">連結</option>
+      <option value="魔法">魔法</option>
+      <option value="陷阱">陷阱</option>
+      <option value="效果">效果</option>
+      <option value="通常">通常</option>
+      <option value="儀式">儀式</option>
+      <option value="靈擺">靈擺</option>
+    </select>
+
+    <label for="baseImg">上傳基準影像：</label>
+    <input type="file" id="baseImg" name="baseImg" accept="image/*" required />
+
+    <button type="submit">開始比對</button>
+  </form>
+
+  <div id="result"></div>
+
+  <script>
+    document.getElementById("matchForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const resultDiv = document.getElementById("result");
+      resultDiv.innerHTML = "<p>處理中，請稍候...</p>";
+
+      try {
+        const response = await fetch("/match", {
+          method: "POST",
+          body: formData
+        });
+
+        if (!response.ok) throw new Error("伺服器錯誤");
+
+        const data = await response.text();
+        // 使用 innerHTML 來渲染 HTML 標籤
+        resultDiv.innerHTML = data;
+      } catch (err) {
+        resultDiv.innerHTML = `<p>發生錯誤：${err.message}</p>`;
+      }
+    });
+  </script>
+</body>
+</html>
